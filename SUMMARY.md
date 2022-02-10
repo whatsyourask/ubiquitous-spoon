@@ -11,3 +11,4 @@
 * [Medium](hack-the-box/medium/README.md)
   * [Writer](hack-the-box/medium/writer.md)
   * [Seal](hack-the-box/medium/seal.md)
+  * [Intelligence](hack-the-box/medium/intelligence.md)
