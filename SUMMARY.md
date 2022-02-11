@@ -13,3 +13,8 @@
   * [Seal](hack-the-box/medium/seal.md)
   * [Intelligence](hack-the-box/medium/intelligence.md)
   * [Forge](hack-the-box/medium/forge.md)
+
+## TryHackMe
+
+* [Easy](tryhackme/easy/README.md)
+  * [VulnNet: Roasted](tryhackme/easy/vulnnet-roasted.md)
