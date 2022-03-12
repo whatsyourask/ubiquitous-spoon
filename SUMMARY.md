@@ -8,6 +8,7 @@
   * [BountyHunter](hack-the-box/easy/bountyhunter.md)
   * [Previse](hack-the-box/easy/previse.md)
   * [Horizontall](hack-the-box/easy/horizontall.md)
+  * [Forest](hack-the-box/easy/forest.md)
 * [Medium](hack-the-box/medium/README.md)
   * [Writer](hack-the-box/medium/writer.md)
   * [Seal](hack-the-box/medium/seal.md)
