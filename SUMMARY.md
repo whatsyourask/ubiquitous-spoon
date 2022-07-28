@@ -21,3 +21,5 @@
   * [VulnNet: Roasted](tryhackme/easy/vulnnet-roasted.md)
 * [Medium](tryhackme/medium/README.md)
   * [Debug](tryhackme/medium/debug.md)
+* [Hard](tryhackme/hard/README.md)
+  * [Enterprize](tryhackme/hard/enterprize.md)
