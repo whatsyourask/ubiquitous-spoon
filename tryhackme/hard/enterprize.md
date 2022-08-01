@@ -1,4 +1,10 @@
+---
+description: 'Box-link: https://tryhackme.com/room/enterprize'
+---
+
 # Enterprize
+
+![A full scheme to get user and root.](<../../.gitbook/assets/image (1).png>)
 
 ## Enumeration
 
