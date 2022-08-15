@@ -23,3 +23,4 @@
   * [Debug](tryhackme/medium/debug.md)
 * [Hard](tryhackme/hard/README.md)
   * [Enterprize](tryhackme/hard/enterprize.md)
+  * [Sea Surfer](tryhackme/hard/sea-surfer.md)
